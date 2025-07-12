@@ -2,7 +2,7 @@
 from flask import Flask, render_template, send_file, jsonify, request
 import matplotlib.pyplot as plt
 from io import BytesIO
-from my_stocks import get_portfolio_data
+from my_stocks import get_portfolio_data_from_df
 import time
 import pandas as pd
 
