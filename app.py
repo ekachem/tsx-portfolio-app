@@ -1,9 +1,11 @@
 # app.py
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, send_file, jsonify, request
 import matplotlib.pyplot as plt
 from io import BytesIO
 from my_stocks import get_portfolio_data
 import time
+import pandas as pd
+
 
 app = Flask(__name__)
 
