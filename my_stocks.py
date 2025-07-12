@@ -5,6 +5,12 @@ from collections import Counter
 
 TFSA_LIMIT = 7000  # hardcoded for now
 
+def get_portfolio_data_from_df(df):
+    # Write logic similar to get_portfolio_data(), but use df directly
+    # For now, you can even reuse get_portfolio_data() by writing df to CSV temp file
+    df.to_csv('temp_portfolio.csv', index=False)
+    return get_portfolio_data('temp_portfolio.csv')
+
 def get_portfolio_data(csv_file='portfolio.csv'):
     portfolio = {}
     df = pd.read_csv(csv_file, parse_dates=['date'])

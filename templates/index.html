@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TSX Portfolio Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <h1 class="mb-4">TSX Portfolio Dashboard</h1>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Portfolio Overview</h5>
+        <p><strong>Initial Investment:</strong> ${{ initial_value }}</p>
+        <p><strong>Current Portfolio Value:</strong> ${{ current_value }}</p>
+        <p><strong>Growth Since Initial Investment:</strong> {{ growth_percent }}%</p>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <img src="{{ url_for('plot_png') }}?v={{ timestamp }}" alt="Growth Plot" class="img-fluid rounded">
+    </div>
+
+    <h3>Holdings</h3>
+    <ul class="list-group mb-4">
+      {% for item in holdings %}
+        <li class="list-group-item">
+          <strong>{{ item.ticker }}</strong>: {{ item.shares }} shares @ ${{ item.buy_price }} → ${{ item.current_price }} ({{ item.change_percent }}%)
+        </li>
+      {% endfor %}
+    </ul>
+
+    <h3>Estimated Annual Dividend Income</h3>
+    {% if dividend_income %}
+      <ul>
+        {% for item in dividend_income %}
+          <li>{{ item.ticker }}: ${{ item.annual_income }} ({{ item.shares }} × ${{ item.rate }})</li>
+        {% endfor %}
+      </ul>
+      <p><strong>Total Estimated Income:</strong> ${{ total_dividend_income }}</p>
+    {% else %}
+      <p>No dividend data available.</p>
+    {% endif %}
+
+    <h3>Upcoming Dividends</h3>
+    {% if upcoming_dividends %}
+      <ul>
+      {% for item in upcoming_dividends %}
+        <li><strong>{{ item.ticker }}</strong>: {{ item.date }} — Est: ${{ "%.2f"|format(item.amount) }} per share</li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p>No upcoming dividends.</p>
+    {% endif %}
+
+    <h3>Investment History</h3>
+    <ul>
+      {% for entry in investment_history %}
+        <li>{{ entry.date }}: {{ entry.ticker }} — {{ entry.shares }} shares @ ${{ entry.buy_price }}</li>
+      {% endfor %}
+    </ul>
+
+    <h3>Sector Allocation</h3>
+    <ul>
+      {% for sector, percent in sector_allocation.items() %}
+        <li>{{ sector }}: {{ "%.2f"|format(percent) }}%</li>
+      {% endfor %}
+    </ul>
+
+    <h3>TFSA Room Tracker</h3>
+    <p><strong>Limit:</strong> ${{ tfsa_limit }}</p>
+    <p><strong>Contributed:</strong> ${{ total_contributed }}</p>
+    <p><strong>Remaining Room:</strong> ${{ tfsa_limit - total_contributed }}</p>
+
+    <h3>Portfolio Risk Flags</h3>
+    <ul>
+      {% for flag in risk_flags %}
+        <li>{{ flag }}</li>
+      {% endfor %}
+    </ul>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
