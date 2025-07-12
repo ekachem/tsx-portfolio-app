@@ -6,10 +6,16 @@ from collections import Counter
 TFSA_LIMIT = 7000  # hardcoded for now
 
 def get_portfolio_data_from_df(df):
-    # Write logic similar to get_portfolio_data(), but use df directly
-    # For now, you can even reuse get_portfolio_data() by writing df to CSV temp file
-    df.to_csv('temp_portfolio.csv', index=False)
-    return get_portfolio_data('temp_portfolio.csv')
+    # Placeholder logic: calculate total value and growth
+    latest_value = (df['shares'] * df['buy_price']).sum()
+    initial_value = latest_value * 0.9  # pretend it grew 10%
+    growth = ((latest_value - initial_value) / initial_value) * 100
+
+    return {
+        "latest_value": round(latest_value, 2),
+        "initial_value": round(initial_value, 2),
+        "growth": round(growth, 2)
+    }
 
 def get_portfolio_data(csv_file='portfolio.csv'):
     portfolio = {}

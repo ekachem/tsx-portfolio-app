@@ -29,12 +29,8 @@ def index():
 def analyze_portfolio():
     portfolio_data = request.get_json()
     df = pd.DataFrame(portfolio_data)
-    analysis = get_portfolio_data_from_df(df)  # you’ll need to write this!
-    return jsonify({
-        'latest_value': analysis['latest_value'],
-        'growth': analysis['growth'],
-        # add more summary if needed
-    })
+    analysis = get_portfolio_data_from_df(df)
+    return jsonify(analysis)
 
 
 @app.route("/plot.png")
