@@ -7,20 +7,41 @@ TFSA_LIMIT = 7000  # hardcoded for now
 
 def get_portfolio_data_from_df(df):
     try:
+        # Ensure numeric columns
         df['shares'] = pd.to_numeric(df['shares'], errors='coerce').fillna(0)
         df['buy_price'] = pd.to_numeric(df['buy_price'], errors='coerce').fillna(0)
 
-        latest_value = (df['shares'] * df['buy_price']).sum()
-        initial_value = latest_value * 0.9  # pretend it grew 10%
-        growth = ((latest_value - initial_value) / initial_value) * 100 if initial_value else 0
+        # Simulate current price +10% (since you don’t have live price here)
+        df['current_price'] = df['buy_price'] * 1.1
+
+        # Calculate initial and current values
+        df['initial_value'] = df['shares'] * df['buy_price']
+        df['current_value'] = df['shares'] * df['current_price']
+
+        total_initial = df['initial_value'].sum()
+        total_current = df['current_value'].sum()
+        growth = ((total_current - total_initial) / total_initial * 100) if total_initial else 0
+
+        # Build holdings summary
+        holdings = []
+        for _, row in df.iterrows():
+            holdings.append({
+                "ticker": row['ticker'],
+                "shares": row['shares'],
+                "buy_price": round(row['buy_price'], 2),
+                "current_price": round(row['current_price'], 2),
+                "change_percent": round((row['current_price'] - row['buy_price']) / row['buy_price'] * 100, 2)
+            })
 
         return {
-            "latest_value": round(latest_value, 2),
-            "initial_value": round(initial_value, 2),
-            "growth": round(growth, 2)
+            "latest_value": round(total_current, 2),
+            "initial_value": round(total_initial, 2),
+            "growth": round(growth, 2),
+            "holdings": holdings
         }
+
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": f"Backend processing error: {str(e)}"}
 
 
 def get_portfolio_data(csv_file='portfolio.csv'):
