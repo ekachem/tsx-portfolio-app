@@ -21,6 +21,10 @@ def get_cached_portfolio_data():
 def ping():
     return "OK", 200
 
+@app.route("/")
+def index():
+    return "Backend API is running. Please use the frontend dashboard.", 200
+
 @app.route('/api/analyze-portfolio', methods=['POST'])
 def analyze_portfolio():
     portfolio_data = request.get_json()
@@ -32,23 +36,6 @@ def analyze_portfolio():
         # add more summary if needed
     })
 
-@app.route("/")
-def index():
-    portfolio = get_cached_portfolio_data()
-    return render_template("index.html",
-                           current_value=round(portfolio["latest_value"], 2),
-                           growth_percent=round(portfolio["growth"], 2),
-                           initial_value=round(portfolio["initial_value"], 2),
-                           timestamp=int(time.time()),
-                           holdings=portfolio["holdings"],
-                           upcoming_dividends=portfolio["upcoming_dividends"],
-                           dividend_income=portfolio["dividend_income"],
-                           total_dividend_income=round(portfolio["total_dividend_income"], 2),
-                           investment_history=portfolio["investment_history"],
-                           sector_allocation=portfolio["sector_allocation"],
-                           tfsa_limit=round(portfolio["tfsa_limit"], 2),
-                           total_contributed=round(portfolio["total_contributed"], 2),
-                           risk_flags=portfolio["risk_flags"])
 
 @app.route("/plot.png")
 def plot_png():
