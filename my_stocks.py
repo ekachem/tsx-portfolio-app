@@ -26,6 +26,45 @@ def get_portfolio_data_from_df(df):
         holdings = []
         for _, row in df.iterrows():
             holdings.append({
+                "ticker": str(row['ticker']),
+                "shares": int(row['shares']),
+                "buy_price": float(round(row['buy_price'], 2)),
+                "current_price": float(round(row['current_price'], 2)),
+                "change_percent": float(round((row['current_price'] - row['buy_price']) / row['buy_price'] * 100, 2))
+            })
+
+        return {
+            "latest_value": float(round(total_current, 2)),
+            "initial_value": float(round(total_initial, 2)),
+            "growth": float(round(growth, 2)),
+            "holdings": holdings
+        }
+
+    except Exception as e:
+        return {"error": f"Backend processing error: {str(e)}"}
+
+
+def get_portfolio_data_from_df_old(df):
+    try:
+        # Ensure numeric columns
+        df['shares'] = pd.to_numeric(df['shares'], errors='coerce').fillna(0)
+        df['buy_price'] = pd.to_numeric(df['buy_price'], errors='coerce').fillna(0)
+
+        # Simulate current price +10% (since you don’t have live price here)
+        df['current_price'] = df['buy_price'] * 1.1
+
+        # Calculate initial and current values
+        df['initial_value'] = df['shares'] * df['buy_price']
+        df['current_value'] = df['shares'] * df['current_price']
+
+        total_initial = df['initial_value'].sum()
+        total_current = df['current_value'].sum()
+        growth = ((total_current - total_initial) / total_initial * 100) if total_initial else 0
+
+        # Build holdings summary
+        holdings = []
+        for _, row in df.iterrows():
+            holdings.append({
                 "ticker": row['ticker'],
                 "shares": row['shares'],
                 "buy_price": round(row['buy_price'], 2),
