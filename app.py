@@ -5,9 +5,11 @@ from io import BytesIO
 from my_stocks import get_portfolio_data_from_df
 import time
 import pandas as pd
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+CORS(app)  # ← THIS enables CORS for all routes
 
 portfolio_cache = {"timestamp": 0, "data": None}
 CACHE_DURATION = 10
