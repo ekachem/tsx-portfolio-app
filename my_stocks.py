@@ -11,6 +11,62 @@ def get_portfolio_data_from_df(df):
         df['shares'] = pd.to_numeric(df['shares'], errors='coerce').fillna(0)
         df['buy_price'] = pd.to_numeric(df['buy_price'], errors='coerce').fillna(0)
 
+        # Get list of tickers
+        tickers = df['ticker'].unique().tolist()
+
+        # Fetch live prices using yfinance
+        live_prices = {}
+        tickers_str = " ".join(tickers)
+        data = yf.download(tickers_str, period='1d', progress=False, group_by='ticker')
+
+        for ticker in tickers:
+            if len(tickers) == 1:
+                # Single ticker case (no multi-level columns)
+                price = data['Close'].iloc[-1]
+            else:
+                price = data[ticker]['Close'].iloc[-1]
+            live_prices[ticker] = price
+
+        # Apply live prices
+        df['current_price'] = df['ticker'].apply(lambda x: live_prices.get(x, df.loc[df['ticker'] == x, 'buy_price']))
+
+        # Calculate initial and current values
+        df['initial_value'] = df['shares'] * df['buy_price']
+        df['current_value'] = df['shares'] * df['current_price']
+
+        total_initial = df['initial_value'].sum()
+        total_current = df['current_value'].sum()
+        growth = ((total_current - total_initial) / total_initial * 100) if total_initial else 0
+
+        # Build holdings summary
+        holdings = []
+        for _, row in df.iterrows():
+            change_percent = ((row['current_price'] - row['buy_price']) / row['buy_price'] * 100) if row['buy_price'] != 0 else 0
+            holdings.append({
+                "ticker": str(row['ticker']),
+                "shares": int(row['shares']),
+                "buy_price": float(round(row['buy_price'], 2)),
+                "current_price": float(round(row['current_price'], 2)),
+                "change_percent": float(round(change_percent, 2))
+            })
+
+        return {
+            "latest_value": float(round(total_current, 2)),
+            "initial_value": float(round(total_initial, 2)),
+            "growth": float(round(growth, 2)),
+            "holdings": holdings
+        }
+
+    except Exception as e:
+        return {"error": f"Backend processing error: {str(e)}"}
+
+
+def get_portfolio_data_from_df_fake(df):
+    try:
+        # Ensure numeric columns
+        df['shares'] = pd.to_numeric(df['shares'], errors='coerce').fillna(0)
+        df['buy_price'] = pd.to_numeric(df['buy_price'], errors='coerce').fillna(0)
+
         # Simulate current price +10% (since you don’t have live price here)
         df['current_price'] = df['buy_price'] * 1.1
 
