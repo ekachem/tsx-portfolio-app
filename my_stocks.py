@@ -50,11 +50,28 @@ def get_portfolio_data_from_df(df):
                 "change_percent": float(round(change_percent, 2))
             })
 
+        # Group by tag and sum values
+        tag_summary = df.groupby('tag').agg({
+            'initial_value': 'sum',
+            'current_value': 'sum'
+        }).reset_index()
+
+        # Build tag summary list
+        tag_summary_list = []
+        for _, row in tag_summary.iterrows():
+            tag_summary_list.append({
+                'tag': row['tag'],
+                'initial_value': float(round(row['initial_value'], 2)),
+                'current_value': float(round(row['current_value'], 2)),
+                'growth': float(round((row['current_value'] - row['initial_value']) / row['initial_value'] * 100, 2)) if row['initial_value'] != 0 else 0
+            })
+
         return {
             "latest_value": float(round(total_current, 2)),
             "initial_value": float(round(total_initial, 2)),
             "growth": float(round(growth, 2)),
-            "holdings": holdings
+            "holdings": holdings,
+            "tag_summary": tag_summary_list
         }
 
     except Exception as e:
