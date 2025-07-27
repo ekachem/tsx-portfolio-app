@@ -70,8 +70,7 @@ def get_portfolio_data_from_df(df):
             "latest_value": float(round(total_current, 2)),
             "initial_value": float(round(total_initial, 2)),
             "growth": float(round(growth, 2)),
-            "holdings": holdings,
-            "tag_summary": tag_summary_list
+            "holdings": holdings
         }
 
     except Exception as e:
